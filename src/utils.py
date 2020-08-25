@@ -1,3 +1,5 @@
+import re
+
 NEWS_SITES = {
     "Lajmi": "https://lajmi.net/",
     "GazetaExpress": "https://www.gazetaexpress.com/",
@@ -11,3 +13,8 @@ NEWS_SITES = {
     "Telegrafi": "https://telegrafi.com/",
     "KlanKosova": "https://klankosova.tv/",
 }
+
+
+def remove_tags(text):
+    clean = re.compile("<.*?>")
+    return re.sub(clean, "", text)
