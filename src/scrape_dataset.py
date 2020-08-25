@@ -6,6 +6,8 @@ from dotenv import find_dotenv, load_dotenv
 from utils import NEWS_SITES
 import requests
 import pandas as pd
+import time
+import random
 
 
 # TODO: Improve click commands
@@ -50,7 +52,8 @@ def extract_specific_data(logger, news_site, web_page, per_page=100, page=1, ext
     logger.info(f"Starting getting {extract_type} of {news_site}")
     result = pd.DataFrame()
     while True:
-        # TODO: Add a sleep timer to prevent overload/not returning/limitations
+        # Sleep to prevent any random blocks or limitations
+        time.sleep(random.randint(30, 60))
         # Create url
         api = f"wp-json/wp/v2/{extract_type}?page={page}&per_page={per_page}"
         url = web_page + api
@@ -85,7 +88,8 @@ def extract_posts(logger, news_site, web_page, per_page=100, page=1):
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
     while True:
-        # TODO: Add a sleep timer to prevent overload/not returning/limitations
+        # Sleep to prevent any random blocks or limitations
+        time.sleep(random.randint(30, 60))
         # Create url
         api = f"wp-json/wp/v2/posts?page={page}&per_page={per_page}"
         url = web_page + api
