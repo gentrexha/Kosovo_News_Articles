@@ -8,4 +8,6 @@ NEWS_SITES = {
     "Indeksonline": "https://indeksonline.net/",
     "Klankosova": "https://klankosova.tv/",
     "Kallxo.com": "https://kallxo.com/",
+    "Telegrafi": "https://telegrafi.com/",
+    "KlanKosova": "https://klankosova.tv/",
 }

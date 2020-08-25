@@ -16,15 +16,15 @@ Kosovo News Articles Dataset
 * https://klankosova.tv/wp-json/wp/v2/posts
 * https://kallxo.com/wp-json/wp/v2/posts
 * https://lajmi.net/wp-json/wp/v2/posts
+* https://telegrafi.com/wp-json/wp/v2/posts
+* https://klankosova.tv/wp-json/wp/v2/posts
 
 #### Without - have to be manually scraped
 
 * https://www.koha.net/arkivi?view=list&data=2020-05-06
-* https://telegrafi.com/arkiva/2020-05-07/
 * https://zeri.info/arkiva/?from=2020-05-01&until=2020-05-07&acid=
 * https://www.botasot.info/lajme/
 	* Shows everything with html pages where all posts are shown
-* https://klankosova.tv/lajme/kosova/
 * https://gjirafa.com/Lajmet
 
 \* Not quite sure if these are official or not. Have to crosscheck with Agjenice e Mediave dhe Gazetarise. 

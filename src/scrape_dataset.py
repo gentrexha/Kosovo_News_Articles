@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 
 
+# TODO: Improve click commands
 @click.command()
 @click.argument("per_page", type=int, default=100)
 def main(per_page: int = 100):
@@ -18,8 +19,9 @@ def main(per_page: int = 100):
     logger.info("Started making requests to News Sites.")
 
     for news_site, web_page in NEWS_SITES.items():
-        extract_posts(logger, news_site, per_page, web_page)
-        extract_categories(logger, news_site, web_page)
+        extract_specific_data(logger, news_site, web_page, extract_type='categories')
+        extract_specific_data(logger, news_site, web_page, extract_type='users')
+        extract_posts(logger, news_site, web_page)
 
 
 def extract_post_data(_post: dict) -> dict:
@@ -33,39 +35,57 @@ def extract_post_data(_post: dict) -> dict:
     return post
 
 
-def extract_categories(logger, news_site, web_page, per_page):
-    logger.info(f"Starting getting categories of {news_site}")
+def extract_category_data(_category: dict):
+    category = {"id": _category["id"], "category": _category["name"]}
+    return category
+
+
+def extract_author_data(_author: dict):
+    category = {"id": _author["id"], "author": _author["name"]}
+    return category
+
+
+def extract_specific_data(logger, news_site, web_page, per_page=100, page=1, extract_type='categories'):
+    assert extract_type == 'categories' or 'users'
+    logger.info(f"Starting getting {extract_type} of {news_site}")
     result = pd.DataFrame()
-    page = 1
     while True:
+        # TODO: Add a sleep timer to prevent overload/not returning/limitations
         # Create url
-        api = f"wp-json/wp/v2/categories?page={page}&per_page={per_page}"
+        api = f"wp-json/wp/v2/{extract_type}?page={page}&per_page={per_page}"
         url = web_page + api
         # Make request
         r = requests.get(url=url)
         # Extracting data in json format
-        categories = r.json()
+        data = r.json()
 
-        if len(categories) == 0:  # TODO: Check if this is the correct error code
-            logger.info(f"No more categories could be found for {news_site} at page={page}")
-            break  # no more posts returned
+        if len(data) == 0:
+            logger.info(
+                f"No more {extract_type} could be found for {news_site} at page={page}"
+            )
+            break
         else:
-            logger.info(f"Getting {per_page} categories at page={page}")
+            logger.info(f"Getting {per_page} {extract_type} at page={page}")
             temp = pd.DataFrame()
-            for i in range(1, len(categories)):
-                post_data = extract_category_data(categories[i])
-                temp = temp.append(pd.DataFrame(post_data), ignore_index=True)
+            for i in range(1, len(data)):
+                if extract_type is 'categories':
+                    extracted_data = extract_category_data(data[i])
+                    temp = temp.append(extracted_data, ignore_index=True)
+                elif extract_type is 'users':
+                    extracted_data = extract_category_data(data[i])
+                    temp = temp.append(extracted_data, ignore_index=True)
+                else:
+                    logger.info(f"Error: extract_type={extract_type} not found!")
         page += 1
-        # TODO: Append data to general dataframe and save current progress
         result = result.append(temp, ignore_index=True)
-        result.to_csv(f"../data/{news_site}_posts.csv")
+        result.to_csv(f"../data/{news_site}_{extract_type}.csv", index=False)
 
 
-def extract_posts(logger, news_site, per_page, web_page):
+def extract_posts(logger, news_site, web_page, per_page=100, page=1):
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
-    page = 1
     while True:
+        # TODO: Add a sleep timer to prevent overload/not returning/limitations
         # Create url
         api = f"wp-json/wp/v2/posts?page={page}&per_page={per_page}"
         url = web_page + api
@@ -73,7 +93,7 @@ def extract_posts(logger, news_site, per_page, web_page):
         r = requests.get(url=url)
         # Extracting data in json format
         posts = r.json()
-        if "code" in posts:  # TODO: Check if this is the correct error code
+        if "code" in posts:
             logger.info(f"No more posts could be found for {news_site} at page={page}")
             break  # no more posts returned
         else:
@@ -81,11 +101,10 @@ def extract_posts(logger, news_site, per_page, web_page):
             temp = pd.DataFrame()
             for i in range(0, 100):
                 post_data = extract_post_data(posts[i])
-                temp = temp.append(pd.DataFrame(post_data), ignore_index=True)
+                temp = temp.append(post_data, ignore_index=True)
         page += 1
-        # TODO: Append data to general dataframe and save current progress
         result = result.append(temp, ignore_index=True)
-        result.to_csv(f"../data/{news_site}_posts.csv")
+        result.to_csv(f"../data/{news_site}_posts.csv", index=False)
 
 
 if __name__ == "__main__":
