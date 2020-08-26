@@ -6,8 +6,6 @@ from dotenv import find_dotenv, load_dotenv
 from utils import NEWS_SITES
 import requests
 import pandas as pd
-import time
-import random
 from datetime import datetime
 from tqdm import tqdm
 
@@ -25,7 +23,7 @@ def main(per_page: int = 100):
     for news_site, web_page in NEWS_SITES.items():
         extract_specific_data(logger, news_site, web_page, extract_type="categories")
         extract_specific_data(logger, news_site, web_page, extract_type="users")
-        extract_posts(logger, news_site, web_page)
+        extract_posts(logger, news_site, web_page, starting_page=1)
 
 
 def extract_post_data(_post: dict) -> dict:
@@ -59,7 +57,8 @@ def extract_specific_data(
     while True:
         try:
             # Sleep to prevent any random blocks or limitations
-            time.sleep(random.randint(30, 60))
+            # time.sleep(random.randint(30, 60))
+
             # Create url
             api = f"wp-json/wp/v2/{extract_type}?page={starting_page}&per_page={per_page}"
             url = web_page + api
@@ -113,7 +112,8 @@ def extract_posts(logger, news_site, web_page, per_page=100, starting_page=1, re
     for page in tqdm(range(starting_page, total_pages + 1), desc="Page"):
         try:
             # Sleep to prevent any random blocks or limitations
-            time.sleep(random.randint(30, 60))
+            # time.sleep(random.randint(30, 60))
+
             # Create url
             api = f"wp-json/wp/v2/posts?page={page}&per_page={per_page}"
             url = web_page + api
@@ -133,13 +133,15 @@ def extract_posts(logger, news_site, web_page, per_page=100, starting_page=1, re
                     post_data = extract_post_data(posts[i])
                     temp = temp.append(post_data, ignore_index=True)
             result = result.append(temp, ignore_index=True)
-            if rerun:
-                result.to_csv(
-                    f"../data/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d-%I_%M_%S_%p')}.csv",
-                    index=False,
-                )
-            else:
-                result.to_csv(f"../data/{news_site}_posts.csv", index=False)
+            # TODO: Make save checkpoints as parameter
+            if page % 500 == 0 or page == total_pages:
+                if rerun:
+                    result.to_csv(
+                        f"../data/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d')}.csv",
+                        index=False,
+                    )
+                else:
+                    result.to_csv(f"../data/{news_site}_posts.csv", index=False)
         except:
             logger.info(f"Failed getting {news_site} {per_page} posts at page={page}")
 
