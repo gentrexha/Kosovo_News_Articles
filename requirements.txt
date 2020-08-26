@@ -16,3 +16,4 @@ pathlib2
 # project requirements
 pandas
 requests
+tqdm

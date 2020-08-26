@@ -8,6 +8,8 @@ import requests
 import pandas as pd
 import time
 import random
+from datetime import datetime
+from tqdm import tqdm
 
 
 # TODO: Improve click commands
@@ -21,8 +23,8 @@ def main(per_page: int = 100):
     logger.info("Started making requests to News Sites.")
 
     for news_site, web_page in NEWS_SITES.items():
-        extract_specific_data(logger, news_site, web_page, extract_type='categories')
-        extract_specific_data(logger, news_site, web_page, extract_type='users')
+        extract_specific_data(logger, news_site, web_page, extract_type="categories")
+        extract_specific_data(logger, news_site, web_page, extract_type="users")
         extract_posts(logger, news_site, web_page)
 
 
@@ -47,68 +49,99 @@ def extract_author_data(_author: dict):
     return category
 
 
-def extract_specific_data(logger, news_site, web_page, per_page=100, page=1, extract_type='categories'):
-    assert extract_type == 'categories' or 'users'
+def extract_specific_data(
+    logger, news_site, web_page, per_page=100, starting_page=1, extract_type="categories"
+):
+    assert extract_type == "categories" or "users"
     logger.info(f"Starting getting {extract_type} of {news_site}")
     result = pd.DataFrame()
+    # TODO: Update method with header information
     while True:
-        # Sleep to prevent any random blocks or limitations
-        time.sleep(random.randint(30, 60))
-        # Create url
-        api = f"wp-json/wp/v2/{extract_type}?page={page}&per_page={per_page}"
-        url = web_page + api
-        # Make request
-        r = requests.get(url=url)
-        # Extracting data in json format
-        data = r.json()
+        try:
+            # Sleep to prevent any random blocks or limitations
+            time.sleep(random.randint(30, 60))
+            # Create url
+            api = f"wp-json/wp/v2/{extract_type}?page={starting_page}&per_page={per_page}"
+            url = web_page + api
+            # Make request
+            r = requests.get(url=url)
+            # Extracting data in json format
+            data = r.json()
 
-        if len(data) == 0:
+            if len(data) == 0:
+                logger.info(
+                    f"No more {extract_type} could be found for {news_site} at page={starting_page}"
+                )
+                break
+            else:
+                logger.info(f"Getting {per_page} {extract_type} at page={starting_page}")
+                temp = pd.DataFrame()
+                for i in range(1, len(data)):
+                    if extract_type is "categories":
+                        extracted_data = extract_category_data(data[i])
+                        temp = temp.append(extracted_data, ignore_index=True)
+                    elif extract_type is "users":
+                        extracted_data = extract_category_data(data[i])
+                        temp = temp.append(extracted_data, ignore_index=True)
+                    else:
+                        logger.info(f"Error: extract_type={extract_type} not found!")
+            starting_page += 1
+            result = result.append(temp, ignore_index=True)
+            result.to_csv(f"../data/{news_site}_{extract_type}.csv", index=False)
+        except:
             logger.info(
-                f"No more {extract_type} could be found for {news_site} at page={page}"
+                f"Failed getting {news_site} {per_page} {extract_type} at page={starting_page}"
             )
-            break
-        else:
-            logger.info(f"Getting {per_page} {extract_type} at page={page}")
-            temp = pd.DataFrame()
-            for i in range(1, len(data)):
-                if extract_type is 'categories':
-                    extracted_data = extract_category_data(data[i])
-                    temp = temp.append(extracted_data, ignore_index=True)
-                elif extract_type is 'users':
-                    extracted_data = extract_category_data(data[i])
-                    temp = temp.append(extracted_data, ignore_index=True)
-                else:
-                    logger.info(f"Error: extract_type={extract_type} not found!")
-        page += 1
-        result = result.append(temp, ignore_index=True)
-        result.to_csv(f"../data/{news_site}_{extract_type}.csv", index=False)
 
 
-def extract_posts(logger, news_site, web_page, per_page=100, page=1):
+def extract_posts(logger, news_site, web_page, per_page=100, starting_page=1, rerun=False):
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
-    while True:
-        # Sleep to prevent any random blocks or limitations
-        time.sleep(random.randint(30, 60))
-        # Create url
-        api = f"wp-json/wp/v2/posts?page={page}&per_page={per_page}"
+    try:
+        # Find out total number of pages
+        api = f"wp-json/wp/v2/posts?page={starting_page}&per_page={per_page}"
         url = web_page + api
         # Make request
         r = requests.get(url=url)
-        # Extracting data in json format
-        posts = r.json()
-        if "code" in posts:
-            logger.info(f"No more posts could be found for {news_site} at page={page}")
-            break  # no more posts returned
-        else:
-            logger.info(f"Getting {per_page} posts at page={page}")
-            temp = pd.DataFrame()
-            for i in range(0, 100):
-                post_data = extract_post_data(posts[i])
-                temp = temp.append(post_data, ignore_index=True)
-        page += 1
-        result = result.append(temp, ignore_index=True)
-        result.to_csv(f"../data/{news_site}_posts.csv", index=False)
+        # Extracting header information
+        total_posts = int(r.headers["X-WP-Total"])
+        total_pages = int(r.headers["X-WP-TotalPages"])
+        logger.info(f"{news_site} has {total_posts} posts and {total_pages} pages.")
+    except:
+        logger.info(f"Failed getting total posts and pages of {news_site}.")
+        return
+    for page in tqdm(range(starting_page, total_pages + 1), desc="Page"):
+        try:
+            # Sleep to prevent any random blocks or limitations
+            time.sleep(random.randint(30, 60))
+            # Create url
+            api = f"wp-json/wp/v2/posts?page={page}&per_page={per_page}"
+            url = web_page + api
+            # Make request
+            r = requests.get(url=url)
+            # Extracting data in json format
+            posts = r.json()
+            if "code" in posts:
+                logger.info(
+                    f"No more posts could be found for {news_site} at page={page}"
+                )
+                break  # no more posts returned
+            else:
+                # logger.info(f"Getting {per_page} posts at page={page}")
+                temp = pd.DataFrame()
+                for i in range(0, 100):
+                    post_data = extract_post_data(posts[i])
+                    temp = temp.append(post_data, ignore_index=True)
+            result = result.append(temp, ignore_index=True)
+            if rerun:
+                result.to_csv(
+                    f"../data/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d-%I_%M_%S_%p')}.csv",
+                    index=False,
+                )
+            else:
+                result.to_csv(f"../data/{news_site}_posts.csv", index=False)
+        except:
+            logger.info(f"Failed getting {news_site} {per_page} posts at page={page}")
 
 
 if __name__ == "__main__":
