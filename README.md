@@ -11,7 +11,6 @@ Kosovo News Articles Dataset
 * https://insajderi.com/wp-json/wp/v2/posts
 * https://gazetablic.com/wp-json/wp/v2/posts
 * https://ballkani.info/wp-json/wp/v2/posts
-* https://www.kosova-sot.info/wp-json/wp/v2/posts
 * https://indeksonline.net/wp-json/wp/v2/posts
 * https://klankosova.tv/wp-json/wp/v2/posts
 * https://kallxo.com/wp-json/wp/v2/posts
@@ -26,6 +25,10 @@ Kosovo News Articles Dataset
 * https://www.botasot.info/lajme/
 	* Shows everything with html pages where all posts are shown
 * https://gjirafa.com/Lajmet
+
+#### Stopped working?!
+
+* https://www.kosova-sot.info/wp-json/wp/v2/posts
 
 \* Not quite sure if these are official or not. Have to crosscheck with Agjenice e Mediave dhe Gazetarise. 
 
