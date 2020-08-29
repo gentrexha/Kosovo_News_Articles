@@ -17,7 +17,7 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Making final data set from raw data.")
 
-    # clean_data(logger)
+    clean_data(logger)
     merge_data(logger)
 
 
