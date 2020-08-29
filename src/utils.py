@@ -2,16 +2,16 @@ import re
 import texthero as hero
 
 NEWS_SITES = {
-    # "Lajmi": "https://lajmi.net/",
-    # "GazetaExpress": "https://www.gazetaexpress.com/",
-    # "Insajderi": "https://insajderi.com/",
-    # "GazetaBlic": "https://gazetablic.com/",
-    # "Ballkani": "https://ballkani.info/",
+    "Lajmi": "https://lajmi.net/",
+    "GazetaExpress": "https://www.gazetaexpress.com/",
+    "Insajderi": "https://insajderi.com/",
+    "GazetaBlic": "https://gazetablic.com/",
+    "Ballkani": "https://ballkani.info/",
     "Indeksonline": "https://indeksonline.net/",
-    # "Klankosova": "https://klankosova.tv/",
-    # "Kallxo.com": "https://kallxo.com/",
+    "Klankosova": "https://klankosova.tv/",
+    "Kallxo.com": "https://kallxo.com/",
     "Telegrafi": "https://telegrafi.com/",
-    # "Kungulli": "https://www.kungulli.com/",
+    "Kungulli": "https://www.kungulli.com/",
 }
 STOPWORDS = ["e", "te", "i", "me", "qe", "ne", "nje", "a", "per", "sh", "nga", "ka", "u", "eshte", "dhe", "shih", "nuk",
              "m", "dicka", "ose", "si", "shume", "etj", "se", "pa", "sipas", "s", "t", "dikujt", "dike", "mire", "vet",

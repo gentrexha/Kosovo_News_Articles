@@ -2,7 +2,7 @@
 # -e .
 
 # external requirements
-click
+click==7.1.2
 Sphinx
 coverage
 awscli
@@ -14,7 +14,8 @@ python-dotenv>=0.5.1
 pathlib2
 
 # project requirements
-pandas
-requests
-tqdm
-texthero
+pandas==1.1.1
+requests==2.24.0
+tqdm==4.48.2
+texthero==1.0.9
+lxml==4.5.2

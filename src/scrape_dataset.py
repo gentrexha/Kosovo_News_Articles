@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import click
 import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
@@ -10,10 +9,7 @@ from datetime import datetime
 from tqdm import tqdm
 
 
-# TODO: Improve click commands
-@click.command()
-@click.argument("per_page", type=int, default=100)
-def main(per_page: int = 100):
+def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -21,9 +17,9 @@ def main(per_page: int = 100):
     logger.info("Started making requests to News Sites.")
 
     for news_site, web_page in NEWS_SITES.items():
-        # extract_specific_data(logger, news_site, web_page, extract_type="categories")
-        # extract_specific_data(logger, news_site, web_page, extract_type="users")
-        extract_posts(logger, news_site, web_page, starting_page=1, rerun=True)
+        extract_specific_data(logger, news_site, web_page, extract_type="categories")
+        extract_specific_data(logger, news_site, web_page, extract_type="users")
+        extract_posts(logger, news_site, web_page)
 
 
 def extract_post_data(_post: dict) -> dict:
@@ -55,7 +51,7 @@ def extract_specific_data(
     starting_page=1,
     extract_type="categories",
     page_checkpoint=10,
-    headers=False,
+    headers=True,
 ):
     assert extract_type == "categories" or "users"
     logger.info(f"Starting getting {extract_type} of {news_site}")
@@ -119,7 +115,7 @@ def extract_specific_data(
                     else:
                         logger.info(f"Error: extract_type={extract_type} not found!")
             result = result.append(temp, ignore_index=True)
-            if page % page_checkpoint == 0 or page == total_pages:
+            if page % page_checkpoint == 0 or page == total_pages or page == total_pages-1:
                 result.to_csv(
                     f"../data/raw/{news_site}_{extract_type}.csv", index=False
                 )
@@ -138,7 +134,7 @@ def extract_posts(
     starting_page=1,
     rerun=False,
     page_checkpoint=100,
-    headers=False,
+    headers=True,
 ):
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
@@ -192,7 +188,7 @@ def extract_posts(
                     post_data = extract_post_data(posts[i])
                     temp = temp.append(post_data, ignore_index=True)
             result = result.append(temp, ignore_index=True)
-            if page % page_checkpoint == 0 or page == total_pages:
+            if page % page_checkpoint == 0 or page == total_pages or page == total_pages-1:
                 if rerun:
                     result.to_csv(
                         f"../data/raw/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d')}.csv",

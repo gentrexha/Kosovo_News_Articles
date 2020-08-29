@@ -3,9 +3,7 @@ Kosovo News Articles Dataset
 
 ## Kosovo News Sites
 
-### Official*
-
-#### With wordpress api
+### Currently included in the dataset
 
 * https://www.gazetaexpress.com/wp-json/wp/v2/posts
 * https://insajderi.com/wp-json/wp/v2/posts
@@ -16,22 +14,15 @@ Kosovo News Articles Dataset
 * https://kallxo.com/wp-json/wp/v2/posts
 * https://lajmi.net/wp-json/wp/v2/posts
 * https://telegrafi.com/wp-json/wp/v2/posts
-* https://klankosova.tv/wp-json/wp/v2/posts
+* https://www.kungulli.com/wp-json/wp/v2/posts (Sarcastic)
 
-#### Without - have to be manually scraped
+### To be included in the future:
+
+**TODO:** Try to scrape the pages below with https://github.com/codelucas/newspaper
 
 * https://www.koha.net/arkivi?view=list&data=2020-05-06
 * https://zeri.info/arkiva/?from=2020-05-01&until=2020-05-07&acid=
 * https://www.botasot.info/lajme/
-	* Shows everything with html pages where all posts are shown
 * https://gjirafa.com/Lajmet
+* https://www.kosova-sot.info/
 
-#### Stopped working?!
-
-* https://www.kosova-sot.info/wp-json/wp/v2/posts
-
-\* Not quite sure if these are official or not. Have to crosscheck with Agjenice e Mediave dhe Gazetarise. 
-
-### Sarcastic
-
-* https://www.kungulli.com/wp-json/wp/v2/posts

@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
-from utils import remove_tags, clean_text
+from utils import clean_text, remove_tags
 from ast import literal_eval
 from utils import NEWS_SITES
 from tqdm import tqdm
@@ -17,6 +17,31 @@ def main():
     logger = logging.getLogger(__name__)
     logger.info("Making final data set from raw data.")
 
+    # clean_data(logger)
+    merge_data(logger)
+
+
+def merge_data(logger):
+    keys = NEWS_SITES.keys()
+
+    dfs = []
+    for news_site, web_page in tqdm(NEWS_SITES.items()):
+        df = pd.read_csv(
+            project_dir / f"data/processed/{news_site}.csv",
+            dtype={"content": str, "title": str, "category": str, "author": str},
+            parse_dates=['date'],
+        )
+        dfs.append(df)
+
+    df = pd.concat([df.assign(source=key) for key, df in zip(keys, dfs)])
+
+    df.to_csv(
+        project_dir / f"data/processed/Kosovo-News-Articles.csv",
+        index=False,
+    )
+
+
+def clean_data(logger):
     for news_site, web_page in tqdm(NEWS_SITES.items()):
         # Load data
         logger.info(f"Loading {news_site} posts.")
@@ -27,19 +52,23 @@ def main():
         df_categories = pd.read_csv(
             project_dir / f"data/raw/{news_site}_categories.csv"
         )
-        if news_site != 'Ballkani':
+        if news_site != "Ballkani":
             df_users = pd.read_csv(project_dir / f"data/raw/{news_site}_users.csv")
         else:
             # Ballkani doesn't have public authors
             df_users = pd.DataFrame()
 
+        # Drop rows with missing values
+        df = df.dropna()
+
         # Clean text
-        # TODO: Remove &nbsp;
         logger.info(f"Cleaning {news_site} posts text.")
-        df["content"] = df["content"].apply(lambda x: remove_tags(str(x)))
-        # TODO: Analyze method below
-        df["content"] = df["content"].apply(lambda x: clean_html(str(x)))
-        df["content"] = clean_text(df["content"])
+        if news_site == 'Telegrafi':
+            df["content"] = clean_text(df["content"])
+            df["content"] = df["content"].apply(lambda x: remove_tags(str(x)))
+        else:
+            df["content"] = df["content"].apply(lambda x: clean_html(str(x)))
+            df["content"] = clean_text(df["content"])
 
         # Add categories
         logger.info(f"Adding {news_site} categories.")
@@ -54,15 +83,14 @@ def main():
             .apply(lambda x: ";".join(x.astype(str)))
             .reset_index()
         )
-        df.head()
 
         # Add users
         logger.info(f"Adding {news_site} users.")
-        if news_site != 'Ballkani':
+        if news_site != "Ballkani":
             df = pd.merge(df, df_users, left_on="author", right_on="id", how="left")
             df.drop(["author_x", "id", "index"], inplace=True, axis=1)
         else:
-            df['author'] = 'Unknown'
+            df["author"] = "Unknown"
             df.drop(["index"], inplace=True, axis=1)
 
         # Save data
