@@ -6,7 +6,13 @@ from utils import clean_text, remove_tags
 from ast import literal_eval
 from utils import NEWS_SITES, logger
 from tqdm import tqdm
-from lxml.html.clean import clean_html
+import lxml.html
+from lxml import etree
+
+
+def clean_html(_html_string: str):
+    document = lxml.html.document_fromstring(_html_string)
+    return "".join(etree.XPath("//text()")(document))
 
 
 def main():
@@ -55,12 +61,9 @@ def clean_data():
 
         # Clean text
         logger.info(f"Cleaning {news_site} posts text.")
-        if news_site == "Telegrafi":
-            df["content"] = clean_text(df["content"])
-            df["content"] = df["content"].apply(lambda x: remove_tags(str(x)))
-        else:
-            df["content"] = df["content"].apply(lambda x: clean_html(str(x)))
-            df["content"] = clean_text(df["content"])
+        # todo: debug this if it is working as inteded.
+        df["content"] = df["content"].apply(lambda x: clean_html(str(x)))
+        df["content"] = clean_text(df["content"])
 
         # Add categories
         logger.info(f"Adding {news_site} categories.")
