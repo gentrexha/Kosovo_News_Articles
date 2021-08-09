@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-from utils import NEWS_SITES
+from utils import NEWS_SITES, logger
 import requests
 import pandas as pd
 from datetime import datetime
@@ -13,13 +12,12 @@ def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
-    logger = logging.getLogger(__name__)
     logger.info("Started making requests to News Sites.")
 
     for news_site, web_page in NEWS_SITES.items():
-        extract_specific_data(logger, news_site, web_page, extract_type="categories")
-        extract_specific_data(logger, news_site, web_page, extract_type="users")
-        extract_posts(logger, news_site, web_page)
+        extract_specific_data(news_site, web_page, extract_type="categories")
+        extract_specific_data(news_site, web_page, extract_type="users")
+        extract_posts(news_site, web_page)
 
 
 def extract_post_data(_post: dict) -> dict:
@@ -44,14 +42,7 @@ def extract_author_data(_author: dict):
 
 
 def extract_specific_data(
-    logger,
-    news_site,
-    web_page,
-    per_page=100,
-    starting_page=1,
-    extract_type="categories",
-    page_checkpoint=10,
-    headers=True,
+    news_site, web_page, per_page=100, starting_page=1, extract_type="categories", page_checkpoint=10, headers=True,
 ):
     assert extract_type == "categories" or "users"
     logger.info(f"Starting getting {extract_type} of {news_site}")
@@ -64,7 +55,7 @@ def extract_specific_data(
         if headers:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                              "Chrome/84.0.4147.135 Safari/537.36 "
+                "Chrome/84.0.4147.135 Safari/537.36 "
             }
             # Make request
             r = requests.get(url=url, headers=headers)
@@ -73,9 +64,7 @@ def extract_specific_data(
         # Extracting header information
         total_posts = int(r.headers["X-WP-Total"])
         total_pages = int(r.headers["X-WP-TotalPages"])
-        logger.info(
-            f"{news_site} has {total_posts} {extract_type} and {total_pages} pages."
-        )
+        logger.info(f"{news_site} has {total_posts} {extract_type} and {total_pages} pages.")
     except Exception as e:
         logger.info(e)
         logger.info(f"Failed getting total posts and pages of {news_site}.")
@@ -89,7 +78,7 @@ def extract_specific_data(
             if headers:
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                                  "Chrome/84.0.4147.135 Safari/537.36 "
+                    "Chrome/84.0.4147.135 Safari/537.36 "
                 }
                 # Make request
                 r = requests.get(url=url, headers=headers)
@@ -99,9 +88,7 @@ def extract_specific_data(
             data = r.json()
 
             if len(data) == 0:
-                logger.info(
-                    f"No more {extract_type} could be found for {news_site} at page={page}"
-                )
+                logger.info(f"No more {extract_type} could be found for {news_site} at page={page}")
                 break
             else:
                 temp = pd.DataFrame()
@@ -115,26 +102,15 @@ def extract_specific_data(
                     else:
                         logger.info(f"Error: extract_type={extract_type} not found!")
             result = result.append(temp, ignore_index=True)
-            if page % page_checkpoint == 0 or page == total_pages or page == total_pages-1:
-                result.to_csv(
-                    f"../data/raw/{news_site}_{extract_type}.csv", index=False
-                )
+            if page % page_checkpoint == 0 or page == total_pages or page == total_pages - 1:
+                result.to_csv(f"../data/raw/{news_site}_{extract_type}.csv", index=False)
         except Exception as e:
             logger.info(e)
-            logger.info(
-                f"Failed getting {news_site} {per_page} {extract_type} at page={page}"
-            )
+            logger.info(f"Failed getting {news_site} {per_page} {extract_type} at page={page}")
 
 
 def extract_posts(
-    logger,
-    news_site,
-    web_page,
-    per_page=100,
-    starting_page=1,
-    rerun=False,
-    page_checkpoint=100,
-    headers=True,
+    news_site, web_page, per_page=100, starting_page=1, rerun=False, page_checkpoint=100, headers=True,
 ):
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
@@ -146,7 +122,7 @@ def extract_posts(
         if headers:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                              "Chrome/84.0.4147.135 Safari/537.36 "
+                "Chrome/84.0.4147.135 Safari/537.36 "
             }
             # Make request
             r = requests.get(url=url, headers=headers)
@@ -169,7 +145,7 @@ def extract_posts(
             if headers:
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                                  "Chrome/84.0.4147.135 Safari/537.36 "
+                    "Chrome/84.0.4147.135 Safari/537.36 "
                 }
                 # Make request
                 r = requests.get(url=url, headers=headers)
@@ -178,9 +154,7 @@ def extract_posts(
             # Extracting data in json format
             posts = r.json()
             if "code" in posts:
-                logger.info(
-                    f"No more posts could be found for {news_site} at page={page}"
-                )
+                logger.info(f"No more posts could be found for {news_site} at page={page}")
                 break  # no more posts returned
             else:
                 temp = pd.DataFrame()
@@ -188,11 +162,10 @@ def extract_posts(
                     post_data = extract_post_data(posts[i])
                     temp = temp.append(post_data, ignore_index=True)
             result = result.append(temp, ignore_index=True)
-            if page % page_checkpoint == 0 or page == total_pages or page == total_pages-1:
+            if page % page_checkpoint == 0 or page == total_pages or page == total_pages - 1:
                 if rerun:
                     result.to_csv(
-                        f"../data/raw/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d')}.csv",
-                        index=False,
+                        f"../data/raw/{news_site}_posts_{datetime.now().strftime('%Y_%m_%d')}.csv", index=False,
                     )
                 else:
                     result.to_csv(f"../data/raw/{news_site}_posts.csv", index=False)
@@ -202,9 +175,6 @@ def extract_posts(
 
 
 if __name__ == "__main__":
-    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[1]
 

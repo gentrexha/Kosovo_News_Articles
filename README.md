@@ -1,9 +1,9 @@
 Kosovo News Articles Dataset
 ==============================
 
-## Kosovo News Sites
+## Getting started
 
-### Currently included in the dataset
+### Kosovo News Sites currently included in the dataset
 
 * https://www.gazetaexpress.com/wp-json/wp/v2/posts
 * https://insajderi.com/wp-json/wp/v2/posts
@@ -16,7 +16,7 @@ Kosovo News Articles Dataset
 * https://telegrafi.com/wp-json/wp/v2/posts
 * https://www.kungulli.com/wp-json/wp/v2/posts (Sarcastic)
 
-### To be included in the future:
+Possibly to be included in the future:
 
 **TODO:** Try to scrape the pages below with https://github.com/codelucas/newspaper
 

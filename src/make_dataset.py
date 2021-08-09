@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import logging
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 import pandas as pd
 from utils import clean_text, remove_tags
 from ast import literal_eval
-from utils import NEWS_SITES
+from utils import NEWS_SITES, logger
 from tqdm import tqdm
 from lxml.html.clean import clean_html
 
@@ -14,14 +13,13 @@ def main():
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
-    logger = logging.getLogger(__name__)
     logger.info("Making final data set from raw data.")
 
-    clean_data(logger)
-    merge_data(logger)
+    clean_data()
+    merge_data()
 
 
-def merge_data(logger):
+def merge_data():
     keys = NEWS_SITES.keys()
 
     dfs = []
@@ -29,29 +27,23 @@ def merge_data(logger):
         df = pd.read_csv(
             project_dir / f"data/processed/{news_site}.csv",
             dtype={"content": str, "title": str, "category": str, "author": str},
-            parse_dates=['date'],
+            parse_dates=["date"],
         )
         dfs.append(df)
 
     df = pd.concat([df.assign(source=key) for key, df in zip(keys, dfs)])
 
     df.to_csv(
-        project_dir / f"data/processed/Kosovo-News-Articles.csv",
-        index=False,
+        project_dir / f"data/processed/Kosovo-News-Articles.csv", index=False,
     )
 
 
-def clean_data(logger):
+def clean_data():
     for news_site, web_page in tqdm(NEWS_SITES.items()):
         # Load data
         logger.info(f"Loading {news_site} posts.")
-        df = pd.read_csv(
-            project_dir / f"data/raw/{news_site}_posts.csv",
-            converters={"categories": literal_eval},
-        )
-        df_categories = pd.read_csv(
-            project_dir / f"data/raw/{news_site}_categories.csv"
-        )
+        df = pd.read_csv(project_dir / f"data/raw/{news_site}_posts.csv", converters={"categories": literal_eval},)
+        df_categories = pd.read_csv(project_dir / f"data/raw/{news_site}_categories.csv")
         if news_site != "Ballkani":
             df_users = pd.read_csv(project_dir / f"data/raw/{news_site}_users.csv")
         else:
@@ -63,7 +55,7 @@ def clean_data(logger):
 
         # Clean text
         logger.info(f"Cleaning {news_site} posts text.")
-        if news_site == 'Telegrafi':
+        if news_site == "Telegrafi":
             df["content"] = clean_text(df["content"])
             df["content"] = df["content"].apply(lambda x: remove_tags(str(x)))
         else:
@@ -74,9 +66,7 @@ def clean_data(logger):
         logger.info(f"Adding {news_site} categories.")
         df = df.explode("categories")
         df = df.reset_index(drop=False)
-        df = pd.merge(
-            df, df_categories, left_on="categories", right_on="id", how="left"
-        )
+        df = pd.merge(df, df_categories, left_on="categories", right_on="id", how="left")
         df.drop(["id", "categories"], inplace=True, axis=1)
         df = (
             df.groupby(["index", "author", "content", "date", "title"])["category"]
@@ -103,9 +93,6 @@ def clean_data(logger):
 
 
 if __name__ == "__main__":
-    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
-
     # not used in this stub but often useful for finding various files
     project_dir = Path(__file__).resolve().parents[1]
 
