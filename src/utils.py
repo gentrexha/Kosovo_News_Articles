@@ -15,6 +15,7 @@ NEWS_SITES = {
     "Telegrafi": "https://telegrafi.com/",
     "Kungulli": "https://www.kungulli.com/",
 }
+
 STOPWORDS = [
     "e",
     "te",
@@ -245,6 +246,7 @@ STOPWORDS = [
     "re",
     "the",
 ]
+
 logger = logging.getLogger(__name__)
 log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 logging.basicConfig(level=logging.INFO, format=log_fmt)

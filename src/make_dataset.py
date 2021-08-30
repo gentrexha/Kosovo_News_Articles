@@ -11,8 +11,12 @@ from lxml import etree
 
 
 def clean_html(_html_string: str):
-    document = lxml.html.document_fromstring(_html_string)
-    return "".join(etree.XPath("//text()")(document))
+    try:
+        document = lxml.html.document_fromstring(_html_string)
+        return "".join(etree.XPath("//text()")(document))
+    except lxml.etree.ParserError as e:
+        logger.error(f"Could not convert html string={_html_string} due to {e}. Returning empty string.")
+        return ""
 
 
 def main():
