@@ -10,7 +10,7 @@ NEWS_SITES = {
     "GazetaBlic": "https://gazetablic.com/",
     "Ballkani": "https://ballkani.info/",
     "Indeksonline": "https://indeksonline.net/",
-    "Klankosova": "https://klankosova.tv/",
+    # "Klankosova": "https://klankosova.tv/",  # Klankosova has forbidden api access from public
     "Kallxo.com": "https://kallxo.com/",
     "Telegrafi": "https://telegrafi.com/",
     "Kungulli": "https://www.kungulli.com/",
