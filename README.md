@@ -5,7 +5,7 @@ Kosovo News Articles Dataset
 
 This is the first publicly available dataset for the Albanian language. It contains more than 3 million news articles from various albanian news sources (see list below).
 
-![Kosovo News Articles Dataset Header](https://storage.googleapis.com/kaggle-datasets-images/850024/1450099/4e0db5a88b46f8b22e7b220ad49953bf/dataset-cover.png?t=2020-08-29-17-34-52)
+![Kosovo News Articles Dataset Header](https://i.imgur.com/o9uT64J.png)
 
 ### Content
 
