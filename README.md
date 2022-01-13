@@ -3,26 +3,25 @@ Kosovo News Articles Dataset
 
 ## Getting started
 
-### Kosovo News Sites currently included in the dataset
+This is the first publicly available dataset for the Albanian language. It contains more than 3 million news articles from various albanian news sources (see list below).
 
-* https://www.gazetaexpress.com/wp-json/wp/v2/posts
-* https://insajderi.com/wp-json/wp/v2/posts
-* https://gazetablic.com/wp-json/wp/v2/posts
-* https://ballkani.info/wp-json/wp/v2/posts
-* https://indeksonline.net/wp-json/wp/v2/posts
-* https://klankosova.tv/wp-json/wp/v2/posts
-* https://kallxo.com/wp-json/wp/v2/posts
-* https://lajmi.net/wp-json/wp/v2/posts
-* https://telegrafi.com/wp-json/wp/v2/posts
-* https://www.kungulli.com/wp-json/wp/v2/posts (Sarcastic)
+![Kosovo News Articles Dataset Header](https://storage.googleapis.com/kaggle-datasets-images/850024/1450099/4e0db5a88b46f8b22e7b220ad49953bf/dataset-cover.png?t=2020-08-29-17-34-52)
 
-Possibly to be included in the future:
+### Content
 
-**TODO:** Try to scrape the pages below with https://github.com/codelucas/newspaper
+After having scraped all of the newspages through their Wordpress API’s we merged all of the data into this file, where to separate the origin of each news article we’ve also added the source to each post.
 
-* https://www.koha.net/arkivi?view=list&data=2020-05-06
-* https://zeri.info/arkiva/?from=2020-05-01&until=2020-05-07&acid=
-* https://www.botasot.info/lajme/
-* https://gjirafa.com/Lajmet
-* https://www.kosova-sot.info/
+All available articles from the first one posted on each page until 27.08.2020 are stored in the file.
 
+These articles were taken from these news pages:
+
+* https://www.gazetaexpress.com/
+* https://insajderi.com/
+* https://gazetablic.com
+* https://ballkani.info/
+* https://indeksonline.net/
+* https://klankosova.tv/ # Was Removed in V2 due to the API not being public anymore.
+* https://kallxo.com/
+* https://lajmi.net/
+* https://telegrafi.com/
+* https://www.kungulli.com/ (Satire)
