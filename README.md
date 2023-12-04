@@ -25,3 +25,5 @@ These articles were taken from these news pages:
 * https://lajmi.net/
 * https://telegrafi.com/
 * https://www.kungulli.com/ (Satire)
+
+**Download the Dataset**: The Kosovo News Articles Dataset is available for download on Kaggle. Access it [here](https://www.kaggle.com/datasets/gentrexha/kosovo-news-articles-dataset).
