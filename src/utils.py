@@ -4,16 +4,30 @@ import logging
 
 
 NEWS_SITES = {
-    "Lajmi": "https://lajmi.net/",
-    "GazetaExpress": "https://www.gazetaexpress.com/",
+    # Kosovo
+    "Lajmi_net": "https://lajmi.net/",
+    # "GazetaExpress": "https://www.gazetaexpress.com/",  # Error
+    # need to merge data from previous version
     "Insajderi": "https://insajderi.com/",
-    "GazetaBlic": "https://gazetablic.com/",
+    # "GazetaBlic": "https://gazetablic.com/",  # Error
+    # need to merge data from previous version
     "Ballkani": "https://ballkani.info/",
-    "Indeksonline": "https://indeksonline.net/",
-    # "Klankosova": "https://klankosova.tv/",  # Klankosova has forbidden api access from public
+    # "Indeksonline": "https://indeksonline.net/",  # Indeksonline has forbidden api access from public,
+    # need to merge data from previous version
+    "Klankosova": "https://klankosova.tv/",
     "Kallxo.com": "https://kallxo.com/",
     "Telegrafi": "https://telegrafi.com/",
-    "Kungulli": "https://www.kungulli.com/",
+    # "Kungulli": "https://www.kungulli.com/",  # Site is not up anymore,
+    # need to merge data from previous version
+    # Albania
+    "Lajme_al": "https://www.lajme.al//",
+    "Bota_al": "https://bota.al/",
+    "abcNews": "https://abcnews.al/",
+    "VizionPlus": "https://www.vizionplus.tv/",
+    "Shekulli": "https://shekulli.com.al/",
+    # "GazetaDita": "https://gazetadita.al/",  # Error
+    "JavaNews_al": "https://javanews.al/",
+    # "news24_al": "https://www.news24.al/",  # Error
 }
 
 STOPWORDS = [

@@ -54,7 +54,9 @@ def clean_data():
         logger.info(f"Loading {news_site} posts.")
         df = pd.read_csv(project_dir / f"data/raw/{news_site}_posts.csv", converters={"categories": literal_eval},)
         df_categories = pd.read_csv(project_dir / f"data/raw/{news_site}_categories.csv")
-        if news_site != "Ballkani":
+        # News sites without public authors
+        na_authors = ["Bota_al", "JavaNews_al", "Kallxo.com", "Shekulli"]
+        if news_site not in na_authors:
             df_users = pd.read_csv(project_dir / f"data/raw/{news_site}_users.csv")
         else:
             # Ballkani doesn't have public authors
@@ -83,7 +85,7 @@ def clean_data():
 
         # Add users
         logger.info(f"Adding {news_site} users.")
-        if news_site != "Ballkani":
+        if news_site not in na_authors:
             df = pd.merge(df, df_users, left_on="author", right_on="id", how="left")
             df.drop(["author_x", "id", "index"], inplace=True, axis=1)
         else:

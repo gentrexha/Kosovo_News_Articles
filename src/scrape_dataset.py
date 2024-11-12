@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 from datetime import datetime
 from tqdm import tqdm
+from random import choice, randint
 
 
 def main():
@@ -112,6 +113,12 @@ def extract_specific_data(
 def extract_posts(
     news_site, web_page, per_page=100, starting_page=1, rerun=False, page_checkpoint=100, headers=True,
 ):
+    session = requests.Session()
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.177 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5414.120 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Safari/605.1.15",
+    ]
     logger.info(f"Starting getting posts of {news_site}")
     result = pd.DataFrame()
     try:
@@ -120,14 +127,13 @@ def extract_posts(
         url = web_page + api
         # create headers
         if headers:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/84.0.4147.135 Safari/537.36 "
-            }
-            # Make request
-            r = requests.get(url=url, headers=headers)
+            r = session.get(url=url, timeout=10, headers={
+                "User-Agent": choice(user_agents),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Referer": web_page
+            })
         else:
-            r = requests.get(url=url)
+            r = session.get(url=url)
         # Extracting header information
         total_posts = int(r.headers["X-WP-Total"])
         total_pages = int(r.headers["X-WP-TotalPages"])
@@ -143,14 +149,13 @@ def extract_posts(
             url = web_page + api
             # create headers
             if headers:
-                headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/84.0.4147.135 Safari/537.36 "
-                }
-                # Make request
-                r = requests.get(url=url, headers=headers)
+                r = session.get(url=url, timeout=10, headers={
+                        "User-Agent": choice(user_agents),
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                        "Referer": web_page
+                    })
             else:
-                r = requests.get(url=url)
+                r = session.get(url=url)
             # Extracting data in json format
             posts = r.json()
             if "code" in posts:
