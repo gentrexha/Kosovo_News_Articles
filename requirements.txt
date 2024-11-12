@@ -11,7 +11,7 @@ pathlib2
 
 # project requirements
 pandas==1.1.1
-requests==2.24.0
+requests==2.32.2
 tqdm==4.48.2
 texthero==1.1.0
 lxml==4.5.2
